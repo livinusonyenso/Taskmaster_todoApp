@@ -10,6 +10,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Routes
+
+// Define a route for the root URL
+app.get('/', (req, res) => {
+  res.send('Server running ');
+});
+
 app.use('/api/todos', todoRoutes);
 
 // Error handling middleware
