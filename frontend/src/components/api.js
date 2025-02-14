@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/todos"; // Replace with your backend URL
+const API_URL = "https://taskmaster-todoapp-1.onrender.com/api/todos"; // Replace with your backend URL
 
 export const fetchTodos = async () => {
   const response = await axios.get(API_URL);
