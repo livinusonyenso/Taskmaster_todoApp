@@ -1,72 +1,77 @@
 import React, { useState } from "react";
 import { deleteTodo } from "./api";
+import { ClipLoader } from "react-spinners"; // Import Spinner
 
 const TodoItem = ({ todo, onDelete, onEdit, onUpdateStatus }) => {
   const [status, setStatus] = useState(todo.status || "Pending");
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
 
   const handleDelete = async () => {
+    setLoadingDelete(true);
     try {
       await deleteTodo(todo._id);
-      console.log("Todo deleted successfully");
       onDelete();
     } catch (error) {
       console.error("Error deleting todo:", error);
+    } finally {
+      setLoadingDelete(false);
     }
   };
 
-  const handleStatusChange = (newStatus) => {
+  const handleStatusChange = async (newStatus) => {
+    setLoadingStatus(true);
     setStatus(newStatus);
-    onUpdateStatus(todo._id, newStatus);
+    await onUpdateStatus(todo._id, newStatus);
+    setLoadingStatus(false);
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-200 to-green-500 p-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 border border-gray-300">
-        
-        {/* Task Title */}
-        <div className="text-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">{todo.title}</h2>
-        </div>
-  
-  <div className="flex">
-  
+    <div className="bg-white shadow-lg rounded-xl p-6  mt-10 border border-gray-200 transition-transform transform hover:scale-105 ">
+      {/* Title & Description */}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-gray-800">{todo.title}</h2>
+        <p className="text-gray-600 text-sm mt-1">{todo.description}</p>
+      </div>
 
-       
-        {/* Action Buttons */}
-        <div className="flex justify-center space-x-4">
-          
-          {/* Edit Button */}
-          <button
-            onClick={() => onEdit(todo)}
-            className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300"
-          >
-            ✏️ Edit
-          </button>
+      {/* Status Dropdown */}
+      <div className="flex items-center justify-between mb-4">
+        <label className="text-gray-600 font-medium">Status:</label>
+        <select
+          value={status}
+          onChange={(e) => handleStatusChange(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          disabled={loadingStatus}
+        >
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        {loadingStatus && <ClipLoader size={18} color="#4CAF50" />}
+      </div>
 
-          {/* Delete Button */}
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 transition-all duration-300"
-          >
-            🗑️ Delete
-          </button>
-        </div>
- {/* Progress Dropdown */}
- <div className="text-center mb-4">
-          <label className="text-gray-600 font-medium mr-2">Status:</label>
-          <select
-            value={status}
-            onChange={(e) => handleStatusChange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
+      {/* Action Buttons */}
+      <div className="flex justify-between">
+        <button
+          onClick={() => {
+            setLoadingEdit(true);
+            onEdit(todo);
+            setTimeout(() => setLoadingEdit(false), 1000);
+          }}
+          className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600 transition-all flex items-center justify-center"
+          disabled={loadingEdit}
+        >
+          {loadingEdit ? <ClipLoader size={18} color="#fff" /> : "✏️ Edit"}
+        </button>
 
-        </div>
-
+        <button
+          onClick={handleDelete}
+          className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 transition-all flex items-center justify-center"
+          disabled={loadingDelete}
+        >
+          {loadingDelete ? <ClipLoader size={18} color="#fff" /> : "🗑️ Delete"}
+        </button>
       </div>
     </div>
   );

@@ -7,10 +7,24 @@ export const fetchTodos = async () => {
   return response.data;
 };
 
+// export const createTodo = async (todo) => {
+//   const response = await axios.post(API_URL, todo);
+//   return response.data;
+// };
 export const createTodo = async (todo) => {
-  const response = await axios.post(API_URL, todo);
-  return response.data;
+  try {
+    const response = await axios.post(API_URL, todo, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Create Todo Error:", error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
+
 
 export const updateTodo = async (id, updatedTodo) => {
   const response = await axios.put(`${API_URL}/${id}`, updatedTodo);
