@@ -1,12 +1,14 @@
 import { useState,useContext } from "react";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { setUser } = useContext(AuthContext);
+  const navigate = useNavigate()
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -15,6 +17,7 @@ const Register = () => {
     console.log("Sending Data:", formData);
     setError("");
     setSuccess("");
+    navigate('/')
 
     try {
       const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/register", formData);
