@@ -13,12 +13,13 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
+    console.log("Sending Login Request:", { email, password });
     try {
-      const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/login", {
+      const res = await axios.post("http://localhost:3000/api/auth/login", {
         email,
         password,
       });
+      console.log("Login Response:", res.data);
 
       const token = res.data.token;
       localStorage.setItem("token", token);
@@ -26,7 +27,8 @@ const Login = () => {
 
       navigate("/todos"); // Redirect to todos page
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Try again.");
+      console.error("Login Error:", err.response ? err.response.data : err.message);
+      setError(err.response?.data?.msg || "Login failed. Try again.");
     }
   };
 

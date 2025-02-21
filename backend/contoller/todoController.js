@@ -149,16 +149,35 @@ exports.registerUser = async (req, res) => {
 // User login
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
+    // Find user by email
+    console.log("Received request body:", req.body);
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: "Invalid credentials" });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
 
+    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
 
+    // Generate JWT token
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token, user: { id: user.id, name, email } });
+    console.log("Login successful:", { id: user.id, email: user.email });
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name, // FIXED: Added user.name
+        email: user.email,
+      },
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 };
