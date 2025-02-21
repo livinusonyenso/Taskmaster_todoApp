@@ -1,25 +1,30 @@
-import { useState } from "react";
+import { useState,useContext } from "react";
 import axios from "axios";
+import AuthContext from "../context/AuthContext";
 
 const Register = ({ setAuth }) => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { setUser } = useContext(AuthContext);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Sending Data:", formData);
     setError("");
     setSuccess("");
 
     try {
       const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/register", formData);
+      console.log("Response Data:", res.data);
       localStorage.setItem("token", res.data.token);
-      setAuth(true);
+      setUser(true);
       setSuccess("Registration successful! Redirecting...");
     } catch (err) {
-      setError("Error registering. Please try again.");
+        setError(err.response?.data?.msg || "Error registering. Please try again.");
+      console.log("Error Response:", err.response?.data); 
     }
   };
 

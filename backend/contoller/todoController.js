@@ -1,6 +1,6 @@
 const { body, validationResult } = require("express-validator");
 const Todo = require("../models/todoModel");
-const User = require("../models/todoModel");
+const { User } = require("../models/todoModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -98,38 +98,86 @@ exports.deleteTodo = async (req, res) => {
 };
 
 // User registration
+// exports.registerUser = async (req, res) => {
+//   const { name, email, password } = req.body;
+//   try {
+//     let user = await User.findOne({ email });
+//     if (user) return res.status(400).json({ msg: "User already exists" });
+
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(password, salt);
+
+//     user = new User({ name, email, password: hashedPassword });
+//     await user.save();
+
+//     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+//     res.json({ token, user: { id: user.id, name, email } });
+//   } catch (err) {
+//     res.status(500).json({ msg: "Server error" });
+//   }
+// };
 exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
+
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: "User already exists" });
 
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Create new user
     user = new User({ name, email, password: hashedPassword });
     await user.save();
 
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    // Check if JWT_SECRET is set in .env
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in .env file");
+    }
+
+    // Generate token
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
     res.json({ token, user: { id: user.id, name, email } });
   } catch (err) {
-    res.status(500).json({ msg: "Server error" });
+    console.error("Registration Error:", err); // Log the actual error
+    res.status(500).json({ msg: "Server error", error: err.message }); // Send detailed error
   }
 };
 
 // User login
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
+    // Find user by email
+    console.log("Received request body:", req.body);
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: "Invalid credentials" });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
 
+    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
 
+    // Generate JWT token
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token, user: { id: user.id, name, email } });
+    console.log("Login successful:", { id: user.id, email: user.email });
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name, // FIXED: Added user.name
+        email: user.email,
+      },
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error" });
   }
 };
