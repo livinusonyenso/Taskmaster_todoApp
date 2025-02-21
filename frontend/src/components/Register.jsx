@@ -10,16 +10,19 @@ const Register = ({ setAuth }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('formData>>>>>>>>>>>>>>>>>',formData)
     setError("");
     setSuccess("");
 
     try {
-      const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/register", formData);
+      const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/register", formData);
+
       localStorage.setItem("token", res.data.token);
       setAuth(true);
       setSuccess("Registration successful! Redirecting...");
     } catch (err) {
       setError("Error registering. Please try again.");
+      console.log(err)
     }
   };
 
