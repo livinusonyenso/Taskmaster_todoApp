@@ -2,7 +2,7 @@ import { useState,useContext } from "react";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
 
-const Register = ({ setAuth }) => {
+const Register = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
