@@ -9,8 +9,7 @@ const TodoList = () => {
   const [editTodo, setEditTodo] = useState(null);
   const { user,logout } = useContext(AuthContext);
 
-  const handleLogout = (item) => {
-  }
+ 
 
   const loadTodos = async () => {
     const data = await fetchTodos(user);

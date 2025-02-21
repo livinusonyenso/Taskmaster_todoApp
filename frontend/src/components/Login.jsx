@@ -15,7 +15,7 @@ const Login = () => {
     setError("");
     console.log("Sending Login Request:", { email, password });
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/login", {
+      const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/login", {
         email,
         password,
       });

@@ -17,7 +17,7 @@ const Register = ({ setAuth }) => {
     setSuccess("");
 
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/register", formData);
+      const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/register", formData);
       console.log("Response Data:", res.data);
       localStorage.setItem("token", res.data.token);
       setUser(true);
