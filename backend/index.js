@@ -7,7 +7,7 @@ const cors = require("cors");
 
 // const authRoutes = require("./routes/todoRoutes");
 // const todoRoutes = require("./routes/authRoutes");
-const authRoutes = require("./routes/authRoutes"); // ✅ Correct
+const authRoutes = require("./routes/authRoutes"); 
 const todoRoutes = require("./routes/todoRoutes");
 
 const app = express();

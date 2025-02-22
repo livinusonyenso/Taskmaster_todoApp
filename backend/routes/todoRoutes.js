@@ -1,6 +1,6 @@
 const express = require("express");
-const { validateTodo, getAllTodos, getTodoById, createTodo, updateTodo, deleteTodo } = require("../contoller/todoController");
-const { registerUser, loginUser } = require("../contoller/todoController");
+const { validateTodo, getAllTodos, getTodoById, createTodo, updateTodo, deleteTodo , registerUser, loginUser } = require("../contoller/todoController");
+// const { registerUser, loginUser } = require("../contoller/todoController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
