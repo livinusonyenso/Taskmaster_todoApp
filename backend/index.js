@@ -5,8 +5,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const authRoutes = require("./routes/todoRoutes");
-const todoRoutes = require("./routes/authRoutes");
+// const authRoutes = require("./routes/todoRoutes");
+// const todoRoutes = require("./routes/authRoutes");
+const authRoutes = require("./routes/authRoutes"); // ✅ Correct
+const todoRoutes = require("./routes/todoRoutes");
 
 const app = express();
 
@@ -26,6 +28,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.get("/", (req, res) => {
   res.send("✅ Todo App with Authentication is running!");
 });
+
+// app.use("/api/auth", authRoutes);
+// app.use("/api/todos", todoRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/todos", todoRoutes);

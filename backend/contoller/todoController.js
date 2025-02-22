@@ -1,6 +1,5 @@
 const { body, validationResult } = require("express-validator");
-const Todo = require("../models/todoModel");
-const { User } = require("../models/todoModel");
+const { User,Todo } = require("../models/todoModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
