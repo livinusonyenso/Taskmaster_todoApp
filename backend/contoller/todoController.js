@@ -50,6 +50,8 @@ exports.getTodoById = async (req, res) => {
 // Create a new todo
 exports.createTodo = async (req, res) => {
   try {
+    console.log("User ID in request:", req.user);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
@@ -150,18 +152,13 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user by email
     console.log("Received request body:", req.body);
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: "Invalid credentials" });
-    }
+    if (!user) return res.status(400).json({ msg: "Invalid credentials" });
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials" });
-    }
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
     // Generate JWT token
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
@@ -171,7 +168,7 @@ exports.loginUser = async (req, res) => {
       token,
       user: {
         id: user.id,
-        name: user.name, // FIXED: Added user.name
+        name: user.name,
         email: user.email,
       },
     });
