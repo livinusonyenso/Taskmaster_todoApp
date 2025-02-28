@@ -18,7 +18,7 @@ router.post("/login", loginUser);
 
 router.get("/", getAllTodos);  // ✅ No extra "/todos"
 router.get("/:id", getTodoById);
-router.post("/", validateTodo, createTodo);
+router.post("/",authMiddleware, validateTodo, createTodo);
 router.put("/:id", validateTodo, updateTodo);
 router.delete("/:id", deleteTodo);
 
