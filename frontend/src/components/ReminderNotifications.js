@@ -22,12 +22,12 @@ const ReminderNotifications = ({ todos = [], onSnooze }) => {
           reminderTime = new Date(`${todo.date} ${hours}:${minutes}:00`);
         }
 
-        console.log("🔍 Checking Reminder:", {
-          task: todo.title,
-          reminderTime: reminderTime ? reminderTime.toLocaleString() : "Not Set",
-          currentTime: now.toLocaleString(),
-          isDue: reminderTime && reminderTime <= now,
-        });
+        // console.log("🔍 Checking Reminder:", {
+        //   task: todo.title,
+        //   reminderTime: reminderTime ? reminderTime.toLocaleString() : "Not Set",
+        //   currentTime: now.toLocaleString(),
+        //   isDue: reminderTime && reminderTime <= now,
+        // });
 
         // If this task is due and has a new reminder time, store it
         if (

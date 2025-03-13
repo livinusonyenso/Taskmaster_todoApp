@@ -52,17 +52,64 @@ export const updateTodo = async (id, updatedTodo) => {
   }
 };
 
-export const deleteTodo = async (id) => {
+// export const deleteTodo = async (id) => {
+//   try {
+//     const response = await axios.delete(`${API_URL}/${id}`, {
+//       headers: {
+//         Authorization: `Bearer ${getAuthToken()}`, // Add token
+//       },
+//     });
+//     console.log("Delete response:", response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Delete Todo Error:", error.response ? error.response.data : error.message);
+//     throw error;
+//   }
+// };
+
+// export const deleteTodo = async (_id) => {
+//   try {
+//     let todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+//     // Ensure `_id` is defined before filtering
+//     if (!_id) {
+//       console.error("Invalid todo ID:", _id);
+//       return;
+//     }
+
+//     // Remove the todo with the given _id
+//     const updatedTodos = todos.filter(todo => todo._id !== _id);
+
+//     // Save updated todos to local storage
+//     localStorage.setItem("todos", JSON.stringify(updatedTodos));
+
+//     console.log("Todo deleted successfully");
+//   } catch (error) {
+//     console.error("Delete Todo Error:", error);
+//   }
+// };
+
+export const deleteTodo = async (_id) => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${getAuthToken()}`, // Add token
-      },
-    });
-    console.log("Delete response:", response.data);
-    return response.data;
+    console.log("Deleting todo with ID:", _id);
+
+    if (!_id) {
+      console.error("Invalid todo ID:", _id);
+      return;
+    }
+
+    let todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+    // Remove only the selected todo
+    const updatedTodos = todos.filter(todo => todo._id !== _id);
+
+    // Save the updated todos list back to local storage
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
+
+    console.log("Todo deleted successfully");
+
+    return updatedTodos; // ✅ Return updated list
   } catch (error) {
-    console.error("Delete Todo Error:", error.response ? error.response.data : error.message);
-    throw error;
+    console.error("Delete Todo Error:", error);
   }
 };
