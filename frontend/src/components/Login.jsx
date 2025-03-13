@@ -3,8 +3,10 @@ import { useNavigate,Link } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
 import { ClipLoader } from "react-spinners"
+import BackgroundAnimation from "./BackgroundAnimation";
 
 const Login = () => {
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,11 +14,16 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
+  console.log("AuthContext:", AuthContext); // ✅ Add this
+
+console.log("Context Value:", setUser); // ✅ Check if setUser exists
+
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true)
-    console.log("Sending Login Request:", { email, password });
+    // console.log("Sending Login Request:", { email, password });
     try {
       const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/login", {
         email,
@@ -38,6 +45,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
+       <BackgroundAnimation />
       <h2 className="text-2xl font-bold mb-4">Login</h2>
       {error && <p className="text-red-500">{error}</p>}
       <form className="flex flex-col space-y-4" onSubmit={handleLogin}>

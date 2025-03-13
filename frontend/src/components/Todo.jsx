@@ -10,13 +10,13 @@ const Todo = ({ todos, deleteTodo, setEditTodo, handleSnoozeReminder, handleDism
       ) : (
         todos.map((todo) => (
           <TodoItem
-            key={todo.id}
-            todo={todo}
-            onDelete={() => deleteTodo(todo.id)}
-            onEdit={setEditTodo}
-            onSnoozeReminder={handleSnoozeReminder}
-            onDismissReminder={handleDismissReminder}
-          />
+  key={todo._id}
+  todo={todo}
+  onDelete={() => deleteTodo(todo._id)} // ✅ Pass correct delete function
+  onEdit={setEditTodo}
+  onSnoozeReminder={handleSnoozeReminder}
+  onDismissReminder={handleDismissReminder}
+/>
         ))
       )}
     </div>

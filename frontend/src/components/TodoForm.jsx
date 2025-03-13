@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TodoForm = ({ todo, onSubmit }) => {
   const [title, setTitle] = useState(todo ? todo.title : "");
@@ -19,39 +21,44 @@ const TodoForm = ({ todo, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const todoData = { 
-      id: todo ? todo.id : Date.now(), 
-      title, 
-      description, 
-      date, 
-      time, // Include time in todo data
-      priority 
+
+    const todoData = {
+      _id: todo ? todo._id : Date.now(), // Use `_id`
+      title,
+      description,
+      date,
+      time,
+      priority,
     };
 
     let storedTodos = JSON.parse(localStorage.getItem("todos")) || [];
 
     if (todo) {
       // Update existing todo
-      storedTodos = storedTodos.map((t) => (t.id === todo.id ? todoData : t));
+      storedTodos = storedTodos.map((t) => (t._id === todo._id ? todoData : t));
+      toast.success("✅ Todo updated successfully!");
     } else {
       // Add new todo
       storedTodos.push(todoData);
+      toast.success("🎉 Todo added successfully!");
     }
 
     localStorage.setItem("todos", JSON.stringify(storedTodos));
 
-    onSubmit(storedTodos); // Pass updated todos to parent
+    onSubmit(storedTodos); // Update UI with new todos
+
+    // Reset form fields
     setTitle("");
     setDescription("");
     setDate("");
-    setTime(""); // Reset time field
+    setTime("");
     setPriority("medium");
   };
 
   return (
     <div className="flex justify-center items-center p-6">
       <div className="w-full max-w-2xl p-8 bg-white shadow-xl rounded-2xl border border-gray-200 backdrop-blur-lg bg-opacity-90">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
           {todo ? "✏️ Update" : "➕ Add"} Todo
         </h2>
 
@@ -90,7 +97,7 @@ const TodoForm = ({ todo, onSubmit }) => {
               required
             />
           </div>
-          
+
           <div>
             <label className="block text-gray-700 font-semibold">Due Time</label>
             <input
@@ -103,7 +110,7 @@ const TodoForm = ({ todo, onSubmit }) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold">Priority</label>
+            <label className="block text-gray-700 font-medium">Priority</label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}

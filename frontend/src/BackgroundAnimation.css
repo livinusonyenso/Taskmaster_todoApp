@@ -1,0 +1,91 @@
+/* Full-screen animated background */
+.background-container {
+    position: fixed; /* ✅ Covers the entire screen */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, #f0fff4, #d4edda); /* ✅ Soft green & white blend */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: -1; /* ✅ Keeps it behind the login form */
+  }
+  
+  /* General text styling */
+  .animated-text {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: rgba(0, 128, 0, 0.6); /* ✅ Soft green */
+    position: absolute;
+    white-space: nowrap;
+    text-shadow: 0 0 10px rgba(0, 128, 0, 0.3); /* ✅ Soft glow effect */
+    animation-duration: 4s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+  
+  /* Unique floating effect for premium look */
+  @keyframes floatEffect {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+  
+  /* Different placements to avoid overlap with login form */
+  
+  /* Top-left */
+  .text-0 {
+    animation-name: floatEffect, slideTopLeft;
+    top: 10%;
+    left: 5%;
+  }
+  
+  @keyframes slideTopLeft {
+    0% { opacity: 0; transform: translateX(-100%) translateY(-100%); }
+    50% { opacity: 1; transform: translateX(0) translateY(0); }
+    100% { opacity: 0; transform: translateX(-100%) translateY(-100%); }
+  }
+  
+  /* Bottom-right */
+  .text-1 {
+    animation-name: floatEffect, slideBottomRight;
+    bottom: 10%;
+    right: 5%;
+  }
+  
+  @keyframes slideBottomRight {
+    0% { opacity: 0; transform: translateX(100%) translateY(100%); }
+    50% { opacity: 1; transform: translateX(0) translateY(0); }
+    100% { opacity: 0; transform: translateX(100%) translateY(100%); }
+  }
+  
+  /* Center-left */
+  .text-2 {
+    animation-name: floatEffect, slideLeft;
+    top: 50%;
+    left: 5%;
+    transform: translateY(-50%);
+  }
+  
+  @keyframes slideLeft {
+    0% { opacity: 0; transform: translateX(-100%); }
+    50% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(-100%); }
+  }
+  
+  /* Center-right */
+  .text-3 {
+    animation-name: floatEffect, slideRight;
+    top: 50%;
+    right: 5%;
+    transform: translateY(-50%);
+  }
+  
+  @keyframes slideRight {
+    0% { opacity: 0; transform: translateX(100%); }
+    50% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(100%); }
+  }
+  
