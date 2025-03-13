@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null); // ✅ Ensure default value is not undefined
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -22,7 +22,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    // ⚠ Don't use navigate() here because AuthContext is outside Router
   };
 
   return (
