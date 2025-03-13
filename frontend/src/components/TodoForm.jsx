@@ -4,6 +4,7 @@ const TodoForm = ({ todo, onSubmit }) => {
   const [title, setTitle] = useState(todo ? todo.title : "");
   const [description, setDescription] = useState(todo ? todo.description : "");
   const [date, setDate] = useState(todo ? todo.date : "");
+  const [time, setTime] = useState(todo ? todo.time : "");
   const [priority, setPriority] = useState(todo ? todo.priority : "medium");
 
   useEffect(() => {
@@ -11,13 +12,21 @@ const TodoForm = ({ todo, onSubmit }) => {
       setTitle(todo.title);
       setDescription(todo.description);
       setDate(todo.date);
+      setTime(todo.time);
       setPriority(todo.priority);
     }
   }, [todo]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const todoData = { id: todo ? todo.id : Date.now(), title, description, date, priority };
+    const todoData = { 
+      id: todo ? todo.id : Date.now(), 
+      title, 
+      description, 
+      date, 
+      time, // Include time in todo data
+      priority 
+    };
 
     let storedTodos = JSON.parse(localStorage.getItem("todos")) || [];
 
@@ -35,6 +44,7 @@ const TodoForm = ({ todo, onSubmit }) => {
     setTitle("");
     setDescription("");
     setDate("");
+    setTime(""); // Reset time field
     setPriority("medium");
   };
 
@@ -76,6 +86,17 @@ const TodoForm = ({ todo, onSubmit }) => {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              className="mt-2 p-4 w-full border border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-400 focus:outline-none transition duration-200"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-gray-700 font-semibold">Due Time</label>
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
               className="mt-2 p-4 w-full border border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-400 focus:outline-none transition duration-200"
               required
             />

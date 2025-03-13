@@ -2,17 +2,20 @@ import { useState, useContext } from "react";
 import { useNavigate,Link } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
+import { ClipLoader } from "react-spinners"
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { setUser } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true)
     console.log("Sending Login Request:", { email, password });
     try {
       const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/login", {
@@ -29,6 +32,7 @@ const Login = () => {
     } catch (err) {
       console.error("Login Error:", err.response ? err.response.data : err.message);
       setError(err.response?.data?.msg || "Login failed. Try again.");
+      setLoading(false)
     }
   };
 
@@ -54,7 +58,8 @@ const Login = () => {
           required
         />
         <button type="submit" className="bg-green-500 text-white p-2 rounded">
-          Login
+        {loading ? <ClipLoader size={20} color="#fff" /> : "Login"}
+
         </button>
       </form>
         {/* Registration encouragement message */}
