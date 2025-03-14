@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { createTodo, updateTodo } from "./api"; // Import API functions
 import "react-toastify/dist/ReactToastify.css";
 
 const TodoForm = ({ todo, onSubmit }) => {
-  const [title, setTitle] = useState(todo ? todo.title : "");
-  const [description, setDescription] = useState(todo ? todo.description : "");
-  const [date, setDate] = useState(todo ? todo.date : "");
-  const [time, setTime] = useState(todo ? todo.time : "");
-  const [priority, setPriority] = useState(todo ? todo.priority : "medium");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [priority, setPriority] = useState("medium");
 
   useEffect(() => {
     if (todo) {
@@ -19,41 +20,42 @@ const TodoForm = ({ todo, onSubmit }) => {
     }
   }, [todo]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const todoData = {
-      _id: todo ? todo._id : Date.now(), // Use `_id`
       title,
       description,
-      date,
-      time,
-      priority,
+      date,  
+      time,  
+      priority,  // ✅ Send priority
     };
-
-    let storedTodos = JSON.parse(localStorage.getItem("todos")) || [];
-
-    if (todo) {
-      // Update existing todo
-      storedTodos = storedTodos.map((t) => (t._id === todo._id ? todoData : t));
-      toast.success("✅ Todo updated successfully!");
-    } else {
-      // Add new todo
-      storedTodos.push(todoData);
-      toast.success("🎉 Todo added successfully!");
+  
+    try {
+      if (todo) {
+        // ✅ Update existing todo
+        const updatedTodo = await updateTodo(todo._id, todoData);
+        toast.success("✅ Todo updated successfully!");
+        onSubmit(updatedTodo);
+      } else {
+        // ✅ Create new todo
+        const newTodo = await createTodo(todoData);
+        toast.success("🎉 Todo added successfully!");
+        onSubmit(newTodo);
+      }
+  
+      // Reset form fields
+      setTitle("");
+      setDescription("");
+      setDate("");
+      setTime("");
+      setPriority("medium");  // ✅ Reset priority
+    } catch (error) {
+      toast.error("❌ Error saving todo. Please try again.");
+      console.error("Todo Form Error:", error);
     }
-
-    localStorage.setItem("todos", JSON.stringify(storedTodos));
-
-    onSubmit(storedTodos); // Update UI with new todos
-
-    // Reset form fields
-    setTitle("");
-    setDescription("");
-    setDate("");
-    setTime("");
-    setPriority("medium");
   };
+  
 
   return (
     <div className="flex justify-center items-center p-6">
