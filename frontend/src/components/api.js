@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://taskmaster-todoapp-1.onrender.com/api/todos"; // Replace with your backend URL
+// const API_URL = "https://taskmaster-todoapp-1.onrender.com/api/todos"; // Replace with your backend URL
+const API_URL = "http://localhost:3000/api/todos"; // Replace with your backend URL
 const getAuthToken = () => localStorage.getItem("token");
 
 // const getAuthToken = () => {
@@ -8,15 +9,20 @@ const getAuthToken = () => localStorage.getItem("token");
 //   console.log("Using Token:", token); // Debugging
 //   return token;
 // };
-
 export const fetchTodos = async () => {
-  const response = await axios.get(API_URL,{
-    headers: {
-      Authorization: `Bearer ${getAuthToken()}`, // Add token
-    },
-  });
-  return response.data;
+  try {
+    const response = await axios.get(API_URL, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`, // ✅ Ensure auth token is sent
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Fetch Todos Error:", error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
+
 
 // export const createTodo = async (todo) => {
 //   const response = await axios.post(API_URL, todo);

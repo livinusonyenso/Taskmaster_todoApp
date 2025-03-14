@@ -4,14 +4,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 // Reminder Notification Component
 const ReminderNotifications = ({ todos = [], onSnooze }) => {
-  const [notifiedTasks, setNotifiedTasks] = useState({}); // Track notified tasks
+  const [notifiedTasks, setNotifiedTasks] = useState(new Set()); // Use Set to track notified tasks
 
   useEffect(() => {
     const checkReminders = () => {
       if (!Array.isArray(todos)) return;
 
       const now = new Date();
-      let nextDueTask = null; // Store the first due task
 
       todos.forEach((todo) => {
         let reminderTime = todo.reminderTime ? new Date(todo.reminderTime) : null;
@@ -22,43 +21,31 @@ const ReminderNotifications = ({ todos = [], onSnooze }) => {
           reminderTime = new Date(`${todo.date} ${hours}:${minutes}:00`);
         }
 
-        // console.log("🔍 Checking Reminder:", {
-        //   task: todo.title,
-        //   reminderTime: reminderTime ? reminderTime.toLocaleString() : "Not Set",
-        //   currentTime: now.toLocaleString(),
-        //   isDue: reminderTime && reminderTime <= now,
-        // });
-
-        // If this task is due and has a new reminder time, store it
+        // If task is due and has not been notified, show notification once
         if (
           reminderTime &&
           reminderTime <= now &&
           !todo.dismissed &&
-          (!notifiedTasks[todo.id] || notifiedTasks[todo.id] !== reminderTime.toISOString()) // Check if new time
+          !notifiedTasks.has(todo.id) // Ensure it hasn’t been notified
         ) {
-          nextDueTask = todo;
+          showNotification(todo, onSnooze);
+
+          // Mark as notified
+          setNotifiedTasks((prev) => new Set([...prev, todo.id]));
         }
       });
-
-      if (nextDueTask) {
-        showNotification(nextDueTask, onSnooze);
-        setNotifiedTasks((prev) => ({
-          ...prev,
-          [nextDueTask.id]: nextDueTask.reminderTime, // Track latest reminder time
-        }));
-      }
     };
 
+    checkReminders(); // Run immediately on mount
     const interval = setInterval(checkReminders, 60000); // Check every minute
+
     return () => clearInterval(interval);
   }, [todos, onSnooze]);
 
   const showNotification = (todo, onSnooze) => {
     if (window.innerWidth <= 768 && navigator.vibrate) {
-      // Mobile: Vibrate
-      navigator.vibrate(1000); // Vibrates for 1 second
+      navigator.vibrate(1000); // Vibrate for 1 second
     } else {
-      // Desktop: Toast Notification for the current due task
       toast.info(
         <div>
           ⏰ Reminder: <strong>{todo.title}</strong> is due!
@@ -85,16 +72,17 @@ const ReminderNotifications = ({ todos = [], onSnooze }) => {
     newReminderTime.setMinutes(newReminderTime.getMinutes() + 5);
     onSnooze(todo.id, newReminderTime);
 
-    // Reset notification tracking for this task
-    setNotifiedTasks((prev) => ({
-      ...prev,
-      [todo.id]: newReminderTime.toISOString(), // Reset when snoozed
-    }));
+    // Remove from notified tasks so it can be re-notified when snoozed
+    setNotifiedTasks((prev) => {
+      const updated = new Set(prev);
+      updated.delete(todo.id);
+      return updated;
+    });
 
     toast.dismiss(); // Close notification after snoozing
 
     if (window.innerWidth <= 768 && navigator.vibrate) {
-      navigator.vibrate(500); // Vibrates for 0.5 seconds after snooze
+      navigator.vibrate(500); // Vibrate after snooze
     } else {
       toast.info("🔔 Snoozed for 5 minutes!");
     }
