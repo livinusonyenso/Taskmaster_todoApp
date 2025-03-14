@@ -1,4 +1,4 @@
-import { useState,useContext } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -8,26 +8,24 @@ const Register = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { setUser } = useContext(AuthContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sending Data:", formData);
     setError("");
     setSuccess("");
-    navigate('/')
-
     try {
-      const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/register", formData);
-      console.log("Response Data:", res.data);
-      localStorage.setItem("token", res.data.token);
-      setUser(true);
+    const res = await axios.post("https://taskmaster-todoapp-1.onrender.com/api/auth/register", formData);
+      const token = res.data.token;
+      localStorage.setItem("token", token);
+      setUser(token);
       setSuccess("Registration successful! Redirecting...");
+      navigate("/todos");
     } catch (err) {
-        setError(err.response?.data?.msg || "Error registering. Please try again.");
-      console.log("Error Response:", err.response?.data); 
+      setError(err.response?.data?.msg || "Error registering. Please try again.");
+      console.log("Error Response:", err.response?.data);
     }
   };
 
@@ -36,10 +34,8 @@ const Register = () => {
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-green-600 mb-4">Welcome to ISONG TodoMaster!</h2>
         <p className="text-gray-600 text-center mb-6">Create an account to manage your tasks efficiently.</p>
-
         {error && <p className="text-red-500 text-center">{error}</p>}
         {success && <p className="text-green-500 text-center">{success}</p>}
-
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
           <input
             type="text"
@@ -69,7 +65,6 @@ const Register = () => {
             Register
           </button>
         </form>
-
         <p className="mt-4 text-gray-600 text-center">
           Already have an account?{" "}
           <a href="/" className="text-blue-500 hover:underline">

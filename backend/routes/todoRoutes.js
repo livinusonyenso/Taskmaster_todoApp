@@ -1,78 +1,132 @@
 const express = require("express");
-const { validateTodo, getAllTodos, getTodoById, createTodo, updateTodo, deleteTodo, registerUser, loginUser } = require("../contoller/todoController");
+const mongoose = require("mongoose"); // ✅ Ensure mongoose is imported
+
+const { registerUser, loginUser } = require("../contoller/todoController"); // ✅ Fixed typo in "controller"
 const authMiddleware = require("../middlewares/authMiddleware");
+const { Todo } = require("../models/todoModel");
 
 const router = express.Router();
 
-// Authentication Routes
+// ✅ Authentication Routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
-// Todo Routes (Protected)
-
+// ✅ Fetch all todos for the logged-in user
 router.get("/", authMiddleware, async (req, res) => {
     try {
-        console.log("Authenticated user:", req.user.id); // ✅ Debugging log
-        const todos = await todos.find({ userId: req.user.id }); // ✅ Only fetch user's todos
+        const userId = req.user.toString(); // Ensure it's a string
+        const todos = await Todo.find({ userId });
         res.json(todos);
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
+    } catch (err) {
+        console.error("❌ Error fetching todos:", err);
+        res.status(500).json({ msg: "Server error" });
     }
 });
 
-
+// ✅ Fetch a single todo (ensure user can only fetch their own)
 router.get("/:id", authMiddleware, async (req, res) => {
     try {
-        const todo = await getTodoById(req.params.id);
+        const userId = req.user.toString();
+        const todo = await Todo.findOne({ _id: req.params.id, userId });
 
-        if (!todo || todo.userId.toString() !== req.user.id) {
-            return res.status(403).json({ message: "Not authorized" });
+        if (!todo) {
+            return res.status(404).json({ message: "Todo not found or not authorized" });
         }
 
         res.json(todo);
     } catch (error) {
+        console.error("❌ Error fetching single todo:", error);
         res.status(500).json({ message: "Server error" });
     }
 });
 
-router.post("/", authMiddleware, validateTodo, async (req, res) => {
+// ✅ Create a new todo
+router.post("/", authMiddleware, async (req, res) => {
     try {
-        const newTodo = await createTodo({ ...req.body, userId: req.user.id });
-        res.status(201).json(newTodo);
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
-});
+        const { title, description, date, time, priority } = req.body;
+        const userId = req.user.toString(); // Ensure it's a string
 
-router.put("/:id", authMiddleware, validateTodo, async (req, res) => {
-    try {
-        const todo = await getTodoById(req.params.id);
-
-        if (!todo || todo.userId.toString() !== req.user.id) {
-            return res.status(403).json({ message: "Not authorized" });
+        if (!title || !description || !date || !time || !priority) {
+            return res.status(400).json({ msg: "All fields are required" });
         }
 
-        const updatedTodo = await updateTodo(req.params.id, req.body);
-        res.json(updatedTodo);
+        const newTodo = new Todo({ title, description, date, time, priority, userId });
+        await newTodo.save();
+        res.json(newTodo);
+    } catch (err) {
+        console.error("❌ Error creating todo:", err);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+// ✅ Update a todo (only if it belongs to the logged-in user)
+router.put("/:id", authMiddleware, async (req, res) => {
+    try {
+        const { title, description, date, time, priority } = req.body;
+        const userId = req.user.toString();
+
+        const todo = await Todo.findOne({ _id: req.params.id, userId });
+
+        if (!todo) {
+            return res.status(404).json({ message: "Todo not found or not authorized" });
+        }
+
+        // ✅ Update todo fields
+        if (title) todo.title = title;
+        if (description) todo.description = description;
+        if (date) todo.date = date;
+        if (time) todo.time = time;
+        if (priority) todo.priority = priority;
+
+        await todo.save();
+        res.json(todo);
     } catch (error) {
+        console.error("❌ Error updating todo:", error);
         res.status(500).json({ message: "Server error" });
     }
 });
+
+// ✅ Delete a todo (only if it belongs to the logged-in user)
+
 
 router.delete("/:id", authMiddleware, async (req, res) => {
-    try {
-        const todo = await getTodoById(req.params.id);
+  try {
+    const userId = req.user.toString();
+    const todoId = req.params.id;
 
-        if (!todo || todo.userId.toString() !== req.user.id) {
-            return res.status(403).json({ message: "Not authorized" });
-        }
+    console.log(`🔍 Delete Request: Todo ID = ${todoId}, User ID = ${userId}`);
 
-        await deleteTodo(req.params.id);
-        res.json({ message: "Todo deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
+    // ✅ Convert todoId to ObjectId
+    if (!mongoose.Types.ObjectId.isValid(todoId)) {
+      console.log("❌ Invalid Todo ID format");
+      return res.status(400).json({ msg: "Invalid Todo ID format" });
     }
+    const todoObjectId = new mongoose.Types.ObjectId(todoId);
+
+    const todo = await Todo.findById(todoObjectId);
+    
+    if (!todo) {
+      console.log("❌ Todo not found in database");
+      return res.status(404).json({ msg: "Todo not found" });
+    }
+
+    // ✅ Check if user owns the todo
+    if (todo.userId.toString() !== userId) {
+      console.log("❌ Unauthorized: User does not own this todo");
+      return res.status(403).json({ msg: "Not authorized" });
+    }
+
+    // ✅ Delete the todo
+    await Todo.deleteOne({ _id: todoObjectId });
+
+    console.log("✅ Todo deleted successfully");
+    res.json({ msg: "Todo deleted successfully" });
+
+  } catch (err) {
+    console.error("❌ Error deleting todo:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
 });
 
-module.exports = router;
 
+module.exports = router;

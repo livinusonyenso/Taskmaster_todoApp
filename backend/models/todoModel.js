@@ -15,7 +15,10 @@ const TodoSchema = new mongoose.Schema({
   description: { type: String, required: true },
   status: { type: String, enum: ["active", "in-progress", "completed"], default: "active" },
   createdAt: { type: Date, default: Date.now },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to User
+  date: { type: String, required: true }, // ✅ Store date
+  time: { type: String, required: true }, // ✅ Store time
+  priority: { type: String, enum: ["low", "medium", "high"], default: "medium" }, // ✅ Add priority
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
 const Todo = mongoose.model("Todo", TodoSchema);
