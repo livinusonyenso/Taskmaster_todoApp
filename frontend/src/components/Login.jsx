@@ -14,9 +14,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
-  console.log("AuthContext:", AuthContext); // ✅ Add this
-
-console.log("Context Value:", setUser); // ✅ Check if setUser exists
 
 
   const handleLogin = async (e) => {
