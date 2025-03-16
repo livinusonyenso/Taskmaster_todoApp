@@ -51,6 +51,7 @@ const TodoItem = ({ todo, onDelete, onEdit }) => {
   return (
     <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-200 transition-transform transform hover:scale-105">
       {/* Title & Description */}
+      
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-2">{todo?.title || "Untitled Todo"}</h2>
         <p className="text-gray-600 text-base">{todo?.description || "No description available"}</p>
