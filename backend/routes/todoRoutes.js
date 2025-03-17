@@ -1,3 +1,4 @@
+
 const express = require("express");
 const mongoose = require("mongoose"); // ✅ Ensure mongoose is imported
 
@@ -90,43 +91,64 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
 
 router.delete("/:id", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.toString();
-    const todoId = req.params.id;
+    console.log("🚀 todoRoutes.js file loaded successfully");
 
-    console.log(`🔍 Delete Request: Todo ID = ${todoId}, User ID = ${userId}`);
+    try {
+      const userId = req.user?.toString();
+      const todoId = req.params.id;
+  
+      console.log(`🔍 Delete Request: Todo ID = ${todoId}, User ID = ${userId}`);
+  
+      // ✅ Check if todoId is provided
+      if (!todoId) {
+        console.log("❌ Missing Todo ID");
+        return res.status(400).json({ msg: "Todo ID is required" });
+      }
+  
+      // ✅ Validate ID format
+      if (!mongoose.Types.ObjectId.isValid(todoId)) {
+        console.log("❌ Invalid Todo ID format:", todoId);
+        return res.status(400).json({ msg: "Invalid Todo ID format" });
+      }
+      
+      const todoObjectId = new mongoose.Types.ObjectId(todoId);
+  
+      // ✅ Find the todo
+      //const todo = await Todo.findById(todoObjectId);
+      const todo = await Todo.findOne({ _id: todoObjectId, userId });
 
-    // ✅ Convert todoId to ObjectId
-    if (!mongoose.Types.ObjectId.isValid(todoId)) {
-      console.log("❌ Invalid Todo ID format");
-      return res.status(400).json({ msg: "Invalid Todo ID format" });
+      console.log(`🔍 Searching for Todo: ${todoObjectId}`);
+  
+      if (!todo) {
+        console.log("❌ Todo not found in database");
+        return res.status(404).json({ msg: "Todo not found" });
+      }
+  
+      // ✅ Check if the authenticated user owns the todo
+      if (todo.userId.toString() !== userId) {
+        console.log("❌ Unauthorized: User does not own this todo");
+        return res.status(403).json({ msg: "Not authorized" });
+      }
+  
+      // ✅ Delete the todo
+      //const deleted = await Todo.deleteOne({ _id: todoObjectId });
+      const deleted = await Todo.findOneAndDelete({ _id: todoObjectId, userId });
+
+      console.log(`🗑️ Deleted Count: ${deleted.deletedCount}`);
+  
+      if (deleted.deletedCount === 0) {
+        return res.status(500).json({ msg: "Failed to delete todo" });
+      }
+  
+      console.log("✅ Todo deleted successfully");
+      res.json({ msg: "Todo deleted successfully" });
+  
+    } catch (err) {
+      console.error("❌ Error deleting todo:", err);
+      res.status(500).json({ msg: "Server error" });
     }
-    const todoObjectId = new mongoose.Types.ObjectId(todoId);
-
-    const todo = await Todo.findById(todoObjectId);
-    
-    if (!todo) {
-      console.log("❌ Todo not found in database");
-      return res.status(404).json({ msg: "Todo not found" });
-    }
-
-    // ✅ Check if user owns the todo
-    if (todo.userId.toString() !== userId) {
-      console.log("❌ Unauthorized: User does not own this todo");
-      return res.status(403).json({ msg: "Not authorized" });
-    }
-
-    // ✅ Delete the todo
-    await Todo.deleteOne({ _id: todoObjectId });
-
-    console.log("✅ Todo deleted successfully");
-    res.json({ msg: "Todo deleted successfully" });
-
-  } catch (err) {
-    console.error("❌ Error deleting todo:", err);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
+  });
+  
 
 
 module.exports = router;
