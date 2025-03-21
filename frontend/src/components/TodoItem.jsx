@@ -3,14 +3,30 @@ import { deleteTodo } from "./api";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import TodoAlarm from "./TodoAlarm";
 
 const TodoItem = ({ todo, onDelete, onEdit }) => {
   const [status, setStatus] = useState("In Progress");
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  useEffect(() => {
-    console.log("📌 Todo Data:", todo);
+  // useEffect(() => {
+  //   console.log("📌 Todo Data:", todo);
 
+  //   const updateStatus = () => {
+  //     if (todo?.time && todo?.date) {
+  //       const currentTime = new Date();
+  //       const todoTime = new Date(`${todo.date}T${todo.time}`);
+  //       setStatus(todoTime < currentTime ? "Completed" : "In Progress");
+  //     }
+  //   };
+
+  //   updateStatus();
+  //   const interval = setInterval(updateStatus, 60000);
+  //   return () => clearInterval(interval);
+  // }, [todo?.date, todo?.time]);
+  useEffect(() => {
+    // console.log("📌 Todo Data:", todo);
+  
     const updateStatus = () => {
       if (todo?.time && todo?.date) {
         const currentTime = new Date();
@@ -18,21 +34,20 @@ const TodoItem = ({ todo, onDelete, onEdit }) => {
         setStatus(todoTime < currentTime ? "Completed" : "In Progress");
       }
     };
-
+  
     updateStatus();
     const interval = setInterval(updateStatus, 60000);
     return () => clearInterval(interval);
-  }, [todo?.date, todo?.time]);
-
+  }, [todo]); // ✅ Now includes 'todo'
+  
   const handleDelete = async () => {
     if (!todo?._id) {
       toast.error("❌ Todo ID is undefined! Cannot delete.");
       return;
     }
 
-    console.log("🔍 Attempting to delete todo with ID:", todo._id);
+    // console.log("🔍 Attempting to delete todo with ID:", todo._id);
 
-    // Optimistically remove from UI
     onDelete(todo._id);
     setLoadingDelete(true);
 
@@ -40,11 +55,25 @@ const TodoItem = ({ todo, onDelete, onEdit }) => {
       await deleteTodo(todo._id);
       toast.success("✅ Todo deleted successfully!");
     } catch (error) {
-      console.error("❌ Error deleting todo:", error);
-      toast.error("❌ Failed to delete todo! Restoring...");
+      // console.error("❌ Error deleting todo:", error);
+      // toast.error("❌ Failed to delete todo! Restoring...");
     } finally {
       setLoadingDelete(false);
     }
+  };
+
+  // ✅ Function to format time in WAT with AM/PM
+  const formatWATTime = (time) => {
+    if (!time) return "No Time Set";
+
+    const date = new Date(`2025-01-01T${time}`); // Use any date
+    const options = {
+      timeZone: "Africa/Lagos", // West Africa Time (WAT)
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // AM/PM format
+    };
+    return new Intl.DateTimeFormat("en-NG", options).format(date);
   };
 
   return (
@@ -59,7 +88,7 @@ const TodoItem = ({ todo, onDelete, onEdit }) => {
           📅 <strong>Date:</strong> {todo?.date || "No Date Set"}
         </p>
         <p className="text-sm text-gray-500 mt-1">
-          ⏰ <strong>Time:</strong> {todo?.time || "No Time Set"}
+          ⏰ <strong>Time:</strong> {formatWATTime(todo?.time)}
         </p>
       </div>
 
@@ -89,11 +118,17 @@ const TodoItem = ({ todo, onDelete, onEdit }) => {
         </span>
       </div>
 
+      {/* Alarm Component */}
+      <TodoAlarm todo={todo} onStatusChange={setStatus} />
+
       <div className="flex justify-between gap-4">
         <button
-          onClick={() => onEdit(todo)}
-          className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600 transition-all flex items-center justify-center flex-1"
-        >
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top smoothly
+              onEdit(todo);
+            }}
+            className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600 transition-all flex items-center justify-center flex-1"
+          >
           ✏️ Edit
         </button>
 
