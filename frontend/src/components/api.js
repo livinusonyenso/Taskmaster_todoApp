@@ -53,7 +53,7 @@ export const deleteTodo = async (id) => {
       headers: { Authorization: `Bearer ${getAuthToken()}` },
     });
   } catch (error) {
-    console.error("Delete Todo Error:", error.response?.data || error.message);
+    // console.error("Delete Todo Error:", error.response?.data || error.message);
     throw error;
   }
 };
