@@ -3,7 +3,6 @@ import { useNavigate,Link } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
 import { ClipLoader } from "react-spinners"
-import BackgroundAnimation from "./BackgroundAnimation";
 
 const Login = () => {
   
@@ -34,7 +33,7 @@ const Login = () => {
 
       navigate("/todos"); // Redirect to todos page
     } catch (err) {
-      console.error("Login Error:", err.response ? err.response.data : err.message);
+     // console.error("Login Error:", err.response ? err.response.data : err.message);
       setError(err.response?.data?.msg || "Login failed. Try again.");
       setLoading(false)
     }
@@ -42,7 +41,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-       <BackgroundAnimation />
+
       <h2 className="text-2xl font-bold mb-4">Login</h2>
       {error && <p className="text-red-500">{error}</p>}
       <form className="flex flex-col space-y-4" onSubmit={handleLogin}>

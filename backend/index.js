@@ -1,20 +1,27 @@
-
-
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-// const authRoutes = require("./routes/todoRoutes");
-// const todoRoutes = require("./routes/authRoutes");
-const authRoutes = require("./routes/authRoutes"); 
+const authRoutes = require("./routes/authRoutes");
 const todoRoutes = require("./routes/todoRoutes");
 
 const app = express();
 
+// ✅ Updated CORS for production
+const corsOptions = {
+
+  origin: "https://taskmaster-todo-app-gold.vercel.app", // 🔁 replace with real frontend domain
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  optionsSuccessStatus: 204,
+  maxAge: 600,
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 // Middleware
 app.use(express.json());
-app.use(cors());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -28,9 +35,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.get("/", (req, res) => {
   res.send("✅ Todo App with Authentication is running!");
 });
-
-// app.use("/api/auth", authRoutes);
-// app.use("/api/todos", todoRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/todos", todoRoutes);
